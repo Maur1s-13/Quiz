@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Quiz.Core.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Quiz.Core.Models;
 
-public class Answer
+public class Answer : IAnswer
 {
     public bool IsTrue { get; set; } = false;
 
