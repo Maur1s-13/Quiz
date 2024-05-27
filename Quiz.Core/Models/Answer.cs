@@ -19,5 +19,9 @@ public class Answer
 
     }
 
+    public Answer(string text) : this(text, false)
+    {
+            
+    }
 
 }
