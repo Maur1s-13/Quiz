@@ -2,11 +2,9 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Quiz.Gui.MainPage"
-             
-             
-        
-             
-                          >
+             xmlns:viewmodels="clr-namespace:Quiz.Gui.ViewModels"
+             x:DataType="viewmodels:MainViewModel"
+             >
 
     <Grid>
         
