@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Quiz.Cli;
 
-public class HistoryQuestionProvider(IAnswer answer) : IQuestionProvider
+public class HistoryQuestionProvider : IQuestionProvider
 {
     
         
@@ -178,9 +178,13 @@ public class HistoryQuestionProvider(IAnswer answer) : IQuestionProvider
 
         List<Question> list = new List<Question>();
 
+        
+
         for (int i = 0; i < num; i++)
         {
-            list.Add(_questions[i]);
+            Random random = new Random();
+            int gen = random.Next(0, _questions.Count());
+            list.Add(_questions[gen]);
         }
 
         return list;
