@@ -1,5 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Quiz.Gui.ViewModels;
+using Syncfusion.Maui.Core.Hosting; 
+
+
+
 
 namespace Quiz.Gui
 {
@@ -19,11 +23,12 @@ namespace Quiz.Gui
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<MainViewModel>();
             builder.Services.AddSingleton<AppShell>();
+            builder.ConfigureSyncfusionCore(); 
 
-            
+
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
