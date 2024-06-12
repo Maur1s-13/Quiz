@@ -1,16 +1,13 @@
 ﻿using Quiz.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Quiz.Cli;
 
 public class HistoryQuestionProvider : IQuestionProvider
-{
-    
-        
+{   
+
+    public string Base64EncodedImage => throw new NotImplementedException();
+
+    public string Topic => throw new NotImplementedException();
 
     public List<Question> GetQuestions(int num)
     {
