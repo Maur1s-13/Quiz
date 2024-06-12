@@ -15,7 +15,7 @@ public partial class MainViewModel : ObservableObject
 {
     [ObservableProperty]
     ObservableCollection<Player> _players = [];
-
+    
     private int _playerId = 1;
 
     [ObservableProperty]
