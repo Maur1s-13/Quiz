@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Quiz.Core;
+using Quiz.Gui.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,11 +9,15 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Quiz.QuestionProviders;
+
+
 
 namespace Quiz.Gui.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
+    #region PopUp
     [ObservableProperty]
     ObservableCollection<Player> _players = [];
     
@@ -72,6 +77,88 @@ public partial class MainViewModel : ObservableObject
             // this.AddRoundCommand.NotifyCanExecuteChanged();
         }
     }
+    #endregion
+
+    #region Game
+    private Game _game = new Game();
+
+    private GameRound? _activeRound = null;
+
+    private Play? _activePlay = null;
+
+    [ObservableProperty]
+    ObservableCollection<QuestionProviderItem> _rounds = [];
+
+    Random gen = new Random();
+
+    private bool UsersAvailable => this.Players.Count > 0;
+
+    public bool IsRoundInit => this._game.Count > 0 && this._game.GetLatestRound().Status == GameRoundStatus.Init;
+
+    public bool IsRoundActive => this._game.Count > 0 && this._game.GetLatestRound().Status == GameRoundStatus.Active;
+
+    public bool IsRoundDone => this._game.Count > 0 && this._game.GetLatestRound().Status == GameRoundStatus.Done;
+
+    public string? RoundTopic
+    {
+        get
+        {
+            if (this._game.Count > 0)
+            {
+                return this._game.GetLatestRound().Topic;
+            }
+
+            return null;
+        }
+    }
+
+    #region Command
+    [RelayCommand(CanExecute = nameof(UsersAvailable))]
+    void AddRound()
+    {
+        IQuestionProvider staticProvider;
+
+        // get random providers
+        // gen.Next returns 0 or 1
+        if (gen.Next(0, 2) == 0)
+        {
+            staticProvider = new StaticQuestions();
+        }
+        else
+        {
+            staticProvider = new HistoryQuestionProvider();
+        }
+
+        // create an item and generate image
+        QuestionProviderItem item = new QuestionProviderItem(staticProvider);
+
+        // add item to game rounds (for the display)
+        this.Rounds.Add(item);
+
+        // add round to game object
+        _game.AddRound(staticProvider, true, 5);
+
+        // add each player to the game object
+        foreach (Player p in Players)
+        {
+            _game.AddPlayerToLatestRound(p);
+        }
+
+        OnPropertyChanged(nameof(RoundTopic));
+
+        OnPropertyChanged(nameof(IsRoundInit));
+        OnPropertyChanged(nameof(IsRoundActive));
+        OnPropertyChanged(nameof(IsRoundDone));
+    }
+
+    #endregion
 
 
+
+
+
+
+
+
+    #endregion
 }

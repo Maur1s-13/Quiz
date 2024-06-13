@@ -6,7 +6,8 @@
              x:DataType="viewmodels:MainViewModel"
              xmlns:models="clr-namespace:Quiz.Core;assembly=Quiz.Core"
              xmlns:local="clr-namespace:Quiz.Gui"
-             x:Class="Quiz.Gui.MainPage">
+             x:Class="Quiz.Gui.MainPage"
+             xmlns:guimodels="clr-namespace:Quiz.Gui.Models">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -16,7 +17,10 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="users.png" Text="Benutzer verwalten" Command="{Binding ManageUsersCommand}" />
+        <ToolbarItem IconImageSource="round.png" Text="Spielrunde hinzufügen" Command="{Binding AddRoundCommand}" />
     </ContentPage.ToolbarItems>
+    
+    
 
     <Grid RowDefinitions="Auto,*,0">
 
