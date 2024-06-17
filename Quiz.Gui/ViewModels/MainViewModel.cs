@@ -13,6 +13,7 @@ using Quiz.QuestionProviders;
 
 
 
+
 namespace Quiz.Gui.ViewModels;
 
 public partial class MainViewModel : ObservableObject
@@ -83,6 +84,8 @@ public partial class MainViewModel : ObservableObject
     // [ObservableProperty]
     // private string _name = string.Empty;
 
+
+
     private string _name = string.Empty;
 
     public string Name
@@ -113,6 +116,9 @@ public partial class MainViewModel : ObservableObject
 
     #region Game
     private Game _game = new Game();
+
+    [ObservableProperty]
+    bool _gameHasRound = false;
 
     private GameRound? _activeRound = null;
 
@@ -181,6 +187,8 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(IsRoundInit));
         OnPropertyChanged(nameof(IsRoundActive));
         OnPropertyChanged(nameof(IsRoundDone));
+
+        this.GameHasRound = true;
     }
 
 
@@ -199,6 +207,67 @@ public partial class MainViewModel : ObservableObject
         }
 
     }
+
+    [RelayCommand]
+    void SelectAnswer(IAnswer answer)
+    {
+        var selAnswer = ActiveQuestion.Answers.FirstOrDefault<IAnswer>(a => a.Id == answer.Id);
+
+        if (selAnswer != null)
+        {
+            selAnswer.IsChecked = true;
+        }
+
+        _activePlay.ValidateCurrentQuestion();
+
+        if (_activePlay.IsActive && _activePlay.MoveNext())
+        {
+            LoadNextQuestion();
+        }
+        else if (_activeRound.Status == GameRoundStatus.Active && _activeRound.MoveNext())
+        {
+            LoadNextPlayer();
+        }
+        else
+        {
+            // check round status
+            OnPropertyChanged(nameof(IsRoundInit));
+            OnPropertyChanged(nameof(IsRoundActive));
+            OnPropertyChanged(nameof(IsRoundDone));
+            OnPropertyChanged(nameof(BestPlayer));
+        }
+
+        // check play status
+        OnPropertyChanged(nameof(IsPlayInit));
+        OnPropertyChanged(nameof(IsPlayActive));
+        OnPropertyChanged(nameof(IsPlayDone));
+
+    }
+
+    public Player? BestPlayer
+    {
+        get
+        {
+            if (_game.Count > 0)
+            {
+                if (_game.GetLatestRound() != null && _game.GetLatestRound().BestPlay() != null)
+                {
+                    return _game.GetLatestRound().BestPlay().Player;
+                }
+                return null;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public bool IsPlayInit => this._activePlay != null && this._activePlay.Status == PlayStatus.Init;
+
+    public bool IsPlayActive => this._activePlay != null && this._activePlay.Status == PlayStatus.Active;
+
+    public bool IsPlayDone => this._activePlay != null && this._activePlay.Status == PlayStatus.Done;
 
     #endregion
 
