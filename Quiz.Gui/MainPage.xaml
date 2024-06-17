@@ -7,11 +7,15 @@
              xmlns:models="clr-namespace:Quiz.Core;assembly=Quiz.Core"
              xmlns:local="clr-namespace:Quiz.Gui"
              x:Class="Quiz.Gui.MainPage"
-             xmlns:guimodels="clr-namespace:Quiz.Gui.Models">
+             xmlns:guimodels="clr-namespace:Quiz.Gui.Models"
+             xmlns:syncfusionListView="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             >
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -24,9 +28,68 @@
 
     <Grid RowDefinitions="Auto,*,0">
 
+        <syncfusionListView:SfListView x:Name="listView"     
+ItemsSource="{Binding Rounds}" ScrollBarVisibility="Never"
+                    SelectionMode="Single"                             
+                    Orientation="Horizontal" 
+                    SelectionBackground="Transparent"
+                    HeightRequest="120"
+                    ItemSpacing="5,8,5,8" 
+                    ItemSize="{OnPlatform Android=120,Default=130}" 
+                    Margin="8,0,0,0" >
+            <syncfusionListView:SfListView.ItemsLayout>
+                <syncfusionListView:LinearLayout />
+            </syncfusionListView:SfListView.ItemsLayout>
+            <syncfusionListView:SfListView.ItemTemplate>
+                <DataTemplate x:DataType="guimodels:QuestionProviderItem">
+                    <Grid RowDefinitions="76,Auto" ColumnDefinitions="Auto">
+                        <Frame HorizontalOptions="Center" CornerRadius="8" 
+                   BorderColor="{StaticResource Primary}"
+                   IsClippedToBounds="True" Padding="0" Margin="0" HasShadow="False" HeightRequest="60">
+                            <Image HorizontalOptions="Center" Source="{Binding ImageSource}" Aspect="Fill" HeightRequest="60"/>
+                        </Frame>
+                        <Grid Grid.Row="1" VerticalOptions="Center" RowDefinitions="Auto">
+                            <Label HorizontalTextAlignment="Center" Text="{Binding Topic}" FontSize="14" TextColor="#666666" FontFamily="Roboto-Regular" CharacterSpacing="0.25"/>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+
+            </syncfusionListView:SfListView.ItemTemplate>
+        </syncfusionListView:SfListView>
+
+        <Grid Margin="10" RowDefinitions="*" Grid.Row="1">
+
+            <Grid RowDefinitions="Auto,*" IsVisible="{Binding GameHasRounds}">
+
+                <Label Grid.Row="0" Text="{Binding RoundTopic, StringFormat='Ihr Themengebiet: {0}'}" FontSize="Medium"
+                    IsVisible="{Binding RoundTopic, Converter={StaticResource IsStringNotNullOrEmptyConverter}}" />
+
+                <StackLayout Grid.Row="1" IsVisible="{Binding IsRoundInit}">
+                    <Button Margin="10" Text="Runde starten"
+                            Command="{Binding StartRoundCommand}" />
+                </StackLayout>
+
+                <Grid Grid.Row="1" IsVisible="{Binding IsRoundActive}" RowDefinitions="Auto,Auto,*">
+
+                    <Label Margin="0,10" FontSize="Medium" 
+       Text="{Binding CurrentPlayer.Name, TargetNullValue='-', StringFormat='Aktiver Spieler: {0}'}" />
+
+                    <Label Grid.Row="1" Margin="0,10" Text="{Binding ActiveQuestion.Text}" FontSize="Large" />
+                </Grid>
+
+            </Grid>
+            
+            
+
+        </Grid>
+
         <local:PopupPage Grid.Row="2" x:Name="popup" 
             IsOpen="{Binding ShowUsersPopup}">
         </local:PopupPage>
+        
+        
     </Grid>
+
+    
 
 </ContentPage>

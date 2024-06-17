@@ -20,7 +20,10 @@ public partial class MainViewModel : ObservableObject
     #region PopUp
     [ObservableProperty]
     ObservableCollection<Player> _players = [];
-    
+
+    [ObservableProperty]
+    private Player? _currentPlayer = null;
+
     private int _playerId = 1;
 
     [ObservableProperty]
@@ -46,6 +49,35 @@ public partial class MainViewModel : ObservableObject
 
         this._playerId++;
         this.NewPlayerName = string.Empty;
+    }
+
+    [ObservableProperty]
+    private Question? _activeQuestion = null;
+    private void LoadNextQuestion()
+    {
+        ActiveQuestion = _activePlay.Current;
+    }
+
+    private void LoadNextPlayer()
+    {
+
+        _activePlay = _activeRound.Current;
+
+        // start session for this player
+        _activePlay.Start();
+
+        CurrentPlayer = _activePlay.Player;
+
+        // get question
+        if (_activePlay.MoveNext())
+        {
+            LoadNextQuestion();
+        }
+
+        OnPropertyChanged(nameof(IsRoundInit));
+        OnPropertyChanged(nameof(IsRoundActive));
+        OnPropertyChanged(nameof(IsRoundDone));
+
     }
 
     // [ObservableProperty]
@@ -74,7 +106,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Remove)
         {
-            // this.AddRoundCommand.NotifyCanExecuteChanged();
+             this.AddRoundCommand.NotifyCanExecuteChanged();
         }
     }
     #endregion
@@ -149,6 +181,23 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(IsRoundInit));
         OnPropertyChanged(nameof(IsRoundActive));
         OnPropertyChanged(nameof(IsRoundDone));
+    }
+
+
+    [RelayCommand]
+    void StartRound()
+    {
+        _activeRound = _game.GetLatestRound();
+        _activeRound.Start();
+
+        // next play
+        var hasPlayer = _activeRound.MoveNext();
+
+        if (hasPlayer)
+        {
+            LoadNextPlayer();
+        }
+
     }
 
     #endregion
